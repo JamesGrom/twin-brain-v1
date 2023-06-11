@@ -26,7 +26,7 @@ import { resolveHtmlPath } from './util';
 
 const config = new Configuration({
   organization: 'org-tZlICar1huZLXg3CUp5twh0C',
-  apiKey: '',
+  apiKey: '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',
 });
 const openAi = new OpenAIApi(config);
 
