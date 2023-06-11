@@ -122,7 +122,22 @@ function Hello() {
             Listen To Screen
           </button>
         </div>
-
+        <button
+          type="button"
+          onClick={() => {
+            (window as any).ipcRenderer.send('setMostRecentScreenContent');
+          }}
+        >
+          SetScreenContentFromClipboard
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            (window as any).ipcRenderer.send('clearChat');
+          }}
+        >
+          Clear Chat
+        </button>
         <div style={{ width: '100%' }}>
           <button
             type="button"

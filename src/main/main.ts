@@ -166,63 +166,28 @@ ipcMain.on('snapshot:getSources', () => {
     });
 });
 
-let prevClipboardContent: string | null = null;
 let messages: CreateChatCompletionResponseChoicesInner['message'][] = [];
 let mostRecentScreenContent: string | null = null;
-ipcMain.on('setMostRecentScreenContent', () => {
-  mostRecentScreenContent = clipboard.readText();
-});
 ipcMain.on('clearChat', () => {
   messages = [];
 });
-// setInterval(() => {
-//   console.log('polling clipboard');
-//   const currentClipboardContent = clipboard.readText();
-//   if (currentClipboardContent !== prevClipboardContent) {
-//     console.log(
-//       `\n-----clipboardContents changed to: \n`,
-//       currentClipboardContent
-//     );
-//     // openAi
-//     //   .createChatCompletion({
-//     //     model: 'gpt-3.5-turbo',
-//     //     messages: [
-//     //       {
-//     //         role: 'user',
-//     //         content: `The following content is displayed on the user's screen: \n ${currentClipboardContent}`,
-//     //       },
-//     //     ],
-//     //   })
-//     //   .then((response) => {
-//     //     console.log(
-//     //       `response from GPT - \n ${response.data.choices[0].message?.content}`
-//     //     );
-//     //     try {
-//     //       // JSON.parse(response.data.choices[0].message?.content)
-//     //     } catch (e) {
-//     //       console.log('error parsing response', e);
-//     //     }
-//     //   })
-//     //   .catch((err) => {
-//     //     console.log('error from chatGPT', err);
-//     //   });
-//     prevClipboardContent = currentClipboardContent;
-//   }
-// }, 1000);
 
 const distpatchScreenContentToGPT = () => {
+  const newMessage: CreateChatCompletionResponseChoicesInner['message'] = {
+    role: 'user',
+    content: `The following content is displayed on the user's screen: \n ${mostRecentScreenContent}`,
+  };
+  messages.push(newMessage);
   openAi
     .createChatCompletion({
       model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'user',
-          content: `The following content is displayed on the user's screen: \n ${mostRecentScreenContent}`,
-        },
-      ],
+      messages: messages as any,
     })
     .then((response) => {
       if (response.data.choices[0].message != null) {
+        console.log(
+          `responseFrom GPT - ${response.data.choices[0].message?.content}`
+        );
         messages.push(response.data.choices[0].message);
       }
     })
@@ -230,6 +195,10 @@ const distpatchScreenContentToGPT = () => {
       console.log('error from chatGPT', err);
     });
 };
+ipcMain.on('setMostRecentScreenContent', () => {
+  mostRecentScreenContent = clipboard.readText();
+  distpatchScreenContentToGPT();
+});
 app
   .whenReady()
   .then(() => {
