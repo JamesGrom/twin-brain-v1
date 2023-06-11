@@ -12,7 +12,6 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import * as fs from 'fs';
 import Tesseract from 'tesseract.js';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
