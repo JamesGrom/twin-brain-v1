@@ -127,8 +127,9 @@ app.on('window-all-closed', () => {
 ipcMain.on('ocr', (event, data: any) => {
   Tesseract.recognize(data, 'eng')
     .then(({ data: { text } }) => {
+      console.log('-------new-snapshot-----');
       console.log(text);
-      event.reply('ocr', text);
+      // event.reply('ocr', text);
     })
     .catch((err) => {
       console.log('err from ocr', err);
@@ -139,7 +140,7 @@ ipcMain.on('snapshot:getSources', () => {
   desktopCapturer
     .getSources({ types: ['screen'] })
     .then((sources) => {
-      console.log('sources', sources);
+      // console.log('sources', sources);
       mainWindow?.webContents?.send('snapshot:availableSources', sources);
     })
     .catch((err) => {
