@@ -63,16 +63,15 @@ function Hello() {
           });
       }
     );
+    videoRef.current!.addEventListener('loadedmetadata', () => {
+      updateCanvasSize();
+    });
   }, []);
   return (
     <div>
-      <div>
-        <video ref={videoRef} muted />
-      </div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={testOcr} ref={testImageRef} />
-        <canvas width="200" ref={canvasRef} />
-      </div>
+      <video ref={videoRef} muted />
+      <img width="200" alt="icon" src={testOcr} ref={testImageRef} />
+      <canvas width="200" ref={canvasRef} />
       <h1>electron-react-boilerplate</h1>
       <div
         style={{
