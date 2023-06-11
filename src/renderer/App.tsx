@@ -37,6 +37,30 @@ function Hello() {
       'snapshot:availableSources',
       (event: any) => {
         console.log('snapshot:availableSources', event);
+        navigator.mediaDevices
+          .getUserMedia({
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                chromeMediaSourceId: (event as DesktopCapturerSource[])[0].id,
+                minWidth: 1280,
+                minHeight: 720,
+                maxFrameRate: 1,
+              },
+            },
+          } as any)
+          .then((stream) => {
+            // eslint-disable-next-line promise/always-return
+            if (videoRef?.current != null) {
+              videoRef.current.srcObject = stream;
+              videoRef.current.play();
+              activeStreamRef.current = stream;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     );
   }, []);
