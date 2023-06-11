@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import Tesseract from 'tesseract.js';
 
 class AppUpdater {
   constructor() {
@@ -122,6 +123,20 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+ipcMain.on('ocr', (event, data: any) => {
+  console.log(`ocr: ${data}`);
+  // Tesseract.createWorker({
+  //   workerPath: path.join(
+  //     __dirname,
+  //     '../../node_modules/tesseract.js/src/node/worker.js'
+  //   ),
+  //   langPath: path.join(
+  //     __dirname,
+  //     '../../node_modules/tesseract.js-core/eng.traineddata.gz'
+  //   ),
+  // });
+  // event.reply('ocr', 'ocr');
 });
 
 app
