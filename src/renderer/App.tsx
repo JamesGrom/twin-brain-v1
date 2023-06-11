@@ -100,7 +100,7 @@ function Hello() {
         }}
       >
         <div>
-          <button
+          {/* <button
             type="button"
             onClick={() => {
               //
@@ -109,18 +109,18 @@ function Hello() {
             }}
           >
             drawToCanvas
-          </button>
+          </button> */}
         </div>
 
         <div>
-          <button
+          {/* <button
             type="button"
             onClick={() => {
               (window as any).ipcRenderer.send('snapshot:getSources');
             }}
           >
             Listen To Screen
-          </button>
+          </button> */}
         </div>
         <button
           type="button"
