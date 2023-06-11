@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, desktopCapturer } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Tesseract from 'tesseract.js';
@@ -134,6 +134,17 @@ ipcMain.on('ocr', (event, data: any) => {
     .catch((err) => {
       console.log('err from ocr', err);
       event.reply('ocr', err);
+    });
+});
+ipcMain.on('snapshot:getSources', () => {
+  desktopCapturer
+    .getSources({ types: ['screen'] })
+    .then((sources) => {
+      console.log('sources', sources);
+      mainWindow?.webContents?.send('snapshot:availableSources', sources);
+    })
+    .catch((err) => {
+      console.log('err from snapshot:getSources', err);
     });
 });
 

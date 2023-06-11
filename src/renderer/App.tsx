@@ -33,33 +33,61 @@ function Hello() {
   };
   return (
     <div>
+      <div>
+        <video ref={videoRef} muted />
+      </div>
       <div className="Hello">
         <img width="200" alt="icon" src={testOcr} ref={testImageRef} />
         <canvas width="200" ref={canvasRef} />
       </div>
       <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <button
-          type="button"
-          onClick={() => {
-            //
-            const context = canvasRef.current?.getContext('2d');
-            context?.drawImage(testImageRef.current!, 0, 0);
-          }}
-        >
-          drawToCanvas
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            // save canvas image as data url (jpeg format by default)
-            const data = canvasRef.current?.toDataURL('image/jpeg');
-            (window as any).electron.ipcRenderer.sendMessage('ocr', data);
-          }}
-        >
-          Run OCR
-        </button>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}
+      >
+        <div>
+          <button
+            type="button"
+            onClick={() => {
+              //
+              const context = canvasRef.current?.getContext('2d');
+              context?.drawImage(testImageRef.current!, 0, 0);
+            }}
+          >
+            drawToCanvas
+          </button>
+        </div>
+
+        <div>
+          <button
+            type="button"
+            onClick={() => {
+              (window as any).electron.ipcRenderer.sendMessage(
+                'snapshot:getSources'
+              );
+            }}
+          >
+            Listen To Screen
+          </button>
+        </div>
+
+        <div style={{ width: '100%' }}>
+          <button
+            type="button"
+            onClick={() => {
+              // save canvas image as data url (jpeg format by default)
+              const data = canvasRef.current?.toDataURL('image/jpeg');
+              (window as any).electron.ipcRenderer.sendMessage('ocr', data);
+            }}
+          >
+            Run OCR
+          </button>
+        </div>
       </div>
+      {/* <div className="Hello"></div> */}
     </div>
   );
 }
