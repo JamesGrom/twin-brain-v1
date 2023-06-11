@@ -9,6 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
+import { Configuration, OpenAIApi } from 'openai';
 import {
   app,
   BrowserWindow,
@@ -22,6 +23,12 @@ import log from 'electron-log';
 import Tesseract from 'tesseract.js';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+
+const config = new Configuration({
+  organization: 'org-tZlICar1huZLXg3CUp5twh0C',
+  apiKey: '',
+});
+const openAi = new OpenAIApi(config);
 
 class AppUpdater {
   constructor() {
