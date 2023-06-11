@@ -12,9 +12,11 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import * as fs from 'fs';
+import Tesseract from 'tesseract.js';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import Tesseract from 'tesseract.js';
+// import fs
 
 class AppUpdater {
   constructor() {
@@ -125,28 +127,15 @@ app.on('window-all-closed', () => {
   }
 });
 ipcMain.on('ocr', (event, data: any) => {
-  console.log(`ocr: ${data}`);
-  // eslint-disable-next-line promise/catch-or-return
-  Tesseract.createWorker({
-    // workerPath: path.join(
-    //   __dirname,
-    //   '../../node_modules/tesseract.js/dist/worker.min.js'
-    // ),
-  }).then((worker) => {
-    worker
-      .recognize(data)
-      .then(({ data: { text } }) => {
-        console.log(text);
-        event.reply('ocr', text);
-        worker.terminate();
-      })
-      .catch((err) => {
-        console.log('err from ocr', err);
-        event.reply('ocr', err);
-        worker.terminate();
-      });
-  });
-  // event.reply('ocr', 'ocr');
+  Tesseract.recognize(data, 'eng')
+    .then(({ data: { text } }) => {
+      console.log(text);
+      event.reply('ocr', text);
+    })
+    .catch((err) => {
+      console.log('err from ocr', err);
+      event.reply('ocr', err);
+    });
 });
 
 app
