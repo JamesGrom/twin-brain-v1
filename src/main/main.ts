@@ -15,7 +15,6 @@ import log from 'electron-log';
 import Tesseract from 'tesseract.js';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-// import fs
 
 class AppUpdater {
   constructor() {

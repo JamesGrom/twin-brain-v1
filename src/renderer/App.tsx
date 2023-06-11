@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { ipcRenderer, DesktopCapturerSource } from 'electron';
+import { useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import testOcr from '../../assets/testocr.png';
 
@@ -9,7 +10,7 @@ function Hello() {
   // useState
   const [snapshot, setSnapshot] = useState<null | string>(null);
   const [snapshotSource, setSnapshotSource] =
-    useState<null | Electron.DesktopCapturerSource>(null);
+    useState<null | DesktopCapturerSource>(null);
   // useRef
   const testImageRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -31,6 +32,14 @@ function Hello() {
       });
     }
   };
+  useEffect(() => {
+    (window as any).ipcRenderer.on(
+      'snapshot:availableSources',
+      (event: any) => {
+        console.log('snapshot:availableSources', event);
+      }
+    );
+  }, []);
   return (
     <div>
       <div>
@@ -65,9 +74,7 @@ function Hello() {
           <button
             type="button"
             onClick={() => {
-              (window as any).electron.ipcRenderer.sendMessage(
-                'snapshot:getSources'
-              );
+              (window as any).ipcRenderer.send('snapshot:getSources');
             }}
           >
             Listen To Screen
@@ -80,7 +87,7 @@ function Hello() {
             onClick={() => {
               // save canvas image as data url (jpeg format by default)
               const data = canvasRef.current?.toDataURL('image/jpeg');
-              (window as any).electron.ipcRenderer.sendMessage('ocr', data);
+              (window as any).ipcRenderer.send('ocr', data);
             }}
           >
             Run OCR
