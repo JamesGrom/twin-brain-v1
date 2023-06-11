@@ -6,7 +6,7 @@ import testOcr from '../../assets/testocr.png';
 import './App.css';
 
 function Hello() {
-  // const ipcRenderer = (window as any).ipcRenderer;
+  // const { ipcRenderer } = window as any;
   // useState
   const [snapshot, setSnapshot] = useState<null | string>(null);
   const [snapshotSource, setSnapshotSource] =
@@ -67,11 +67,30 @@ function Hello() {
       updateCanvasSize();
     });
   }, []);
+  const grabAndPreviewFrame = () => {
+    if (canvasRef?.current != null && videoRef?.current != null) {
+      const context = canvasRef.current.getContext('2d');
+      context?.drawImage(
+        videoRef.current,
+        0,
+        0,
+        canvasSize.width,
+        canvasSize.height
+      );
+      const dataURL = canvasRef.current.toDataURL('image/png');
+      (window as any).ipcRenderer.send('snapshot:save', dataURL);
+    }
+  };
   return (
     <div>
       <video ref={videoRef} muted />
       <img width="200" alt="icon" src={testOcr} ref={testImageRef} />
-      <canvas width="200" ref={canvasRef} />
+      <canvas
+        ref={canvasRef}
+        width={canvasSize.width}
+        height={canvasSize.height}
+        style={{ backgroundColor: 'red' }}
+      />
       <h1>electron-react-boilerplate</h1>
       <div
         style={{
@@ -109,6 +128,7 @@ function Hello() {
             type="button"
             onClick={() => {
               // save canvas image as data url (jpeg format by default)
+              grabAndPreviewFrame();
               const data = canvasRef.current?.toDataURL('image/jpeg');
               (window as any).ipcRenderer.send('ocr', data);
             }}
