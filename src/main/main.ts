@@ -9,7 +9,14 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, desktopCapturer } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  desktopCapturer,
+  clipboard,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Tesseract from 'tesseract.js';
@@ -148,6 +155,19 @@ ipcMain.on('snapshot:getSources', () => {
     });
 });
 
+let prevClipboardContent: string | null = null;
+setInterval(() => {
+  // throw 'stop';
+  console.log('polling clipboard');
+  const currentClipboardContent = clipboard.readText();
+  if (currentClipboardContent !== prevClipboardContent) {
+    console.log(
+      `\n-----clipboardContents changed to: \n`,
+      currentClipboardContent
+    );
+    prevClipboardContent = currentClipboardContent;
+  }
+}, 1000);
 app
   .whenReady()
   .then(() => {
