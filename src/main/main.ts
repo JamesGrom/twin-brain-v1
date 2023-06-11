@@ -126,16 +126,26 @@ app.on('window-all-closed', () => {
 });
 ipcMain.on('ocr', (event, data: any) => {
   console.log(`ocr: ${data}`);
-  // Tesseract.createWorker({
-  //   workerPath: path.join(
-  //     __dirname,
-  //     '../../node_modules/tesseract.js/src/node/worker.js'
-  //   ),
-  //   langPath: path.join(
-  //     __dirname,
-  //     '../../node_modules/tesseract.js-core/eng.traineddata.gz'
-  //   ),
-  // });
+  // eslint-disable-next-line promise/catch-or-return
+  Tesseract.createWorker({
+    // workerPath: path.join(
+    //   __dirname,
+    //   '../../node_modules/tesseract.js/dist/worker.min.js'
+    // ),
+  }).then((worker) => {
+    worker
+      .recognize(data)
+      .then(({ data: { text } }) => {
+        console.log(text);
+        event.reply('ocr', text);
+        worker.terminate();
+      })
+      .catch((err) => {
+        console.log('err from ocr', err);
+        event.reply('ocr', err);
+        worker.terminate();
+      });
+  });
   // event.reply('ocr', 'ocr');
 });
 
