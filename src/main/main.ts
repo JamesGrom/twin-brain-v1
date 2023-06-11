@@ -9,7 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { Configuration, OpenAIApi } from 'openai';
+import {
+  Configuration,
+  OpenAIApi,
+  CreateChatCompletionResponseChoicesInner,
+} from 'openai';
 import {
   app,
   BrowserWindow,
@@ -26,7 +30,7 @@ import { resolveHtmlPath } from './util';
 
 const config = new Configuration({
   organization: 'org-tZlICar1huZLXg3CUp5twh0C',
-  apiKey: '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',
+  apiKey: '',
 });
 const openAi = new OpenAIApi(config);
 
@@ -163,18 +167,69 @@ ipcMain.on('snapshot:getSources', () => {
 });
 
 let prevClipboardContent: string | null = null;
-setInterval(() => {
-  // throw 'stop';
-  console.log('polling clipboard');
-  const currentClipboardContent = clipboard.readText();
-  if (currentClipboardContent !== prevClipboardContent) {
-    console.log(
-      `\n-----clipboardContents changed to: \n`,
-      currentClipboardContent
-    );
-    prevClipboardContent = currentClipboardContent;
-  }
-}, 1000);
+let messages: CreateChatCompletionResponseChoicesInner['message'][] = [];
+let mostRecentScreenContent: string | null = null;
+ipcMain.on('setMostRecentScreenContent', () => {
+  mostRecentScreenContent = clipboard.readText();
+});
+ipcMain.on('clearChat', () => {
+  messages = [];
+});
+// setInterval(() => {
+//   console.log('polling clipboard');
+//   const currentClipboardContent = clipboard.readText();
+//   if (currentClipboardContent !== prevClipboardContent) {
+//     console.log(
+//       `\n-----clipboardContents changed to: \n`,
+//       currentClipboardContent
+//     );
+//     // openAi
+//     //   .createChatCompletion({
+//     //     model: 'gpt-3.5-turbo',
+//     //     messages: [
+//     //       {
+//     //         role: 'user',
+//     //         content: `The following content is displayed on the user's screen: \n ${currentClipboardContent}`,
+//     //       },
+//     //     ],
+//     //   })
+//     //   .then((response) => {
+//     //     console.log(
+//     //       `response from GPT - \n ${response.data.choices[0].message?.content}`
+//     //     );
+//     //     try {
+//     //       // JSON.parse(response.data.choices[0].message?.content)
+//     //     } catch (e) {
+//     //       console.log('error parsing response', e);
+//     //     }
+//     //   })
+//     //   .catch((err) => {
+//     //     console.log('error from chatGPT', err);
+//     //   });
+//     prevClipboardContent = currentClipboardContent;
+//   }
+// }, 1000);
+
+const distpatchScreenContentToGPT = () => {
+  openAi
+    .createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'user',
+          content: `The following content is displayed on the user's screen: \n ${mostRecentScreenContent}`,
+        },
+      ],
+    })
+    .then((response) => {
+      if (response.data.choices[0].message != null) {
+        messages.push(response.data.choices[0].message);
+      }
+    })
+    .catch((err) => {
+      console.log('error from chatGPT', err);
+    });
+};
 app
   .whenReady()
   .then(() => {
